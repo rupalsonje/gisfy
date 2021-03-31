@@ -1,66 +1,74 @@
-<?php
-session_start();    
-include('db_connect.php');
+<?php 
+    session_start();    
+    include('db_connect.php');
 
 $name = '';
 $class = '';
 
 $count=1;
+if(isset($_GET['id'])){
+    $id = mysqli_real_escape_string($conn,$_GET['id']);
+    $sql="SELECT * FROM `student data` WHERE id = $id;";
+    
+    $result = mysqli_query($conn,$sql);
 
-$sql="SELECT `id`,`name`,`class` FROM `s+tudent data` ORDER BY `id`;";
+    $record = mysqli_fetch_all($result,MYSQLI_ASSOC);
 
-$result = mysqli_query($conn,$sql);
+    mysqli_free_result($result);
+}
 
-$record = mysqli_fetch_all($result,MYSQLI_ASSOC);
-
-mysqli_free_result($result);
-
-$error = array('class'=>'','name'=>'','image'=>'','video'=>'');
+$error = array('class'=>'','name'=>'');
 
 if(isset($_POST['submit'])){
-if(empty($_POST['name'])){
-    $error['name']= "name is required";
-}
-else{
-    $name = htmlspecialchars($_POST['name']);
-}
+    if(empty($_POST['name'])){
+        $error['name']= "name is required";
+    }
+    else{
+        $name = htmlspecialchars($_POST['name']);
+    }
+    
+    if(empty($_POST['class'])){
+        $error['class']= "class is required";
+    }
+    else{
+        $author = htmlspecialchars($_POST['author']);
+    }
+    if(empty($_POST['image'])){
+        $error['image']= "image is required";
+    }
+    else{
+        $image = htmlspecialchars($_POST['image']);        
+    }
+    if(empty($_POST['video'])){
+        $error['video']= "video is required";
+    }
+    else{
+        $video = htmlspecialchars($_POST['video']);        
+    }
+    
+    if(array_filter($error)){
+    }
+    else{
+        $name = mysqli_real_escape_string($conn,$_POST['name']);
+        $class = mysqli_real_escape_string($conn,$_POST['class']);        
+        $image = mysqli_real_escape_string($conn,$_POST['image']);
+        $video = mysqli_real_escape_string($conn,$_POST['video']);
 
-if(empty($_POST['class'])){
-    $error['class']= "class is required";
-}
-else{
-    $class= htmlspecialchars($_POST['class']);
-}
-
-if(empty($_POST['image'])){
-    $error['image']= "image is required";
-}
-else{
-    $image = htmlspecialchars($_POST['image']);        
-}
-if(empty($_POST['video'])){
-    $error['video']= "video is required";
-}
-else{
-    $video = htmlspecialchars($_POST['video']);        
-}
-if(array_filter($error)){
-}
-else{
-
-    $name = mysqli_real_escape_string($conn,$_POST['name']);
-    $class = mysqli_real_escape_string($conn,$_POST['class']);
-    $image = mysqli_real_escape_string($conn,$_POST['image']);
-    $video = mysqli_real_escape_string($conn,$_POST['video']);
-
-    $sql = "INSERT INTO `students data`(`name`,`class`,`image`,`video`) VALUES ('$name','$class','$image','$video');";
-    if(mysqli_query($conn,$sql)){
-        header('Location:index.php');
-        mysqli_close($conn);
+        $sql = "UPDATE `student data` SET `name`='".$name."',`class`='".$class."',`image`='".$image."',`video`='".$video."' WHERE id='".$id."'";
+            
+        if(mysqli_query($conn,$sql)){
+            header('Location:index.php');
+            mysqli_close($conn);
+        }
+        else{
+            $error['video']="Error! Unable to get data";
+            // echo print_r($error);
+        }
     }
 }
-}
+
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -105,10 +113,9 @@ else{
                   id="name"
                   class="form-control form-location"
                   placeholder="What's Your Name?"
-                  value="<?php echo $name ?>"
+                  value="<?php echo $record[0]['name'] ?>"
                 />
                 <small><?php echo $error['name']; ?></small>
-
               </div>
               <div class="form-index">
                 <label id="class-label" for="class">Class</label>
@@ -118,64 +125,28 @@ else{
                   id="class"
                   class="form-control form-location"
                   placeholder="Enter your Class"
-                  value="<?php echo $class ?>"
+                  value="<?php echo $record[0]['class'] ?>"
                 />
                 <small><?php echo $error['class']; ?></small>
               </div>
               <div class="form-index">
                 <label id="image-label" for="image">Image</label>
-                <input type="file" id="image" name="image" accept="image/*" class="form-control form-location">
+                <input type="file" id="image" name="image" accept="image/*" class="form-control form-location" >
                 <small><?php echo $error['image']; ?></small>
               </div>
               <div class="form-index">
                 <label id="video-label" for="video">Video</label>
-                <input type="file" id="video" name="video" accept="video/mp4,video/x-m4v,video/*" class="form-control form-location">
+                <input type="file" id="video" name="video" accept="video/mp4,video/x-m4v,video/*" class="form-control form-location" >
                 <small><?php echo $error['video']; ?></small>
               </div>
                 <div class="form-index">
                   <button type="submit" id="submit" name="submit" class="submit-button">
-                    Submit
+                    UPDATE
                   </button>
                 </div>
             </form>
           </div>
         </div>
-
-        <section id="table">
-          <!--for demo wrap-->
-          <h1 class="tbl-title">Student's Record</h1>
-          <div class="tbl-header">
-            <table>
-              <thead>
-                <tr>
-                  <th>SR NO.</th>
-                  <th>NAME</th>
-                  <th>CLASS</th>
-                  <th>EDIT</th>
-                  <th>DELETE</th>
-                </tr>
-              </thead>
-            </table>
-          </div>
-          <div class="tbl-content">
-            <table>
-            <?php if (count($record)==0){ ?>
-                        <p class="text-center"><?php echo"no data found"; ?></p>
-                    <?php }else{?>
-                <?php foreach($record as $data){ ?>
-              <tbody>
-                <tr>
-                  <td><?php echo $count?></td>
-                  <td><?php echo htmlspecialchars($data['name']); ?></td>
-                  <td><?php echo htmlspecialchars($data['author']); ?></td>
-                  <td><a href="" class="edit"><i class="material-icons app-icon">build</i></a></td>
-                  <td><a href="" class="delete"><i class="material-icons app-icon">highlight_off</i></a></td>
-                </tr>
-              </tbody>
-              <?php $count++; }}?>
-            </table>
-          </div>
-        </section>
       </div>
 
       <!----- App Sidebar--->

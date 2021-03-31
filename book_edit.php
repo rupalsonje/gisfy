@@ -63,7 +63,7 @@ if(isset($_POST['submit'])){
         }
         else{
             $error['year']="Error! Unable to get data";
-            echo print_r($error);
+            // echo print_r($error);
         }
     }
 }
