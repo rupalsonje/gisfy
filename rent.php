@@ -1,10 +1,79 @@
+<?php 
+    session_start();    
+    include('db_connect.php');
+
+$name = '';
+$book = '';
+
+$count=1;
+
+$sql="SELECT `id`,`name`,`book`,`start_date`,`end_date` FROM `rent data` ORDER BY `id`;";
+
+$result = mysqli_query($conn,$sql);
+
+$record = mysqli_fetch_all($result,MYSQLI_ASSOC);
+
+mysqli_free_result($result);
+
+
+$error = array('book'=>'','name'=>'','start_date'=>'','end_date'=>'');
+
+if(isset($_POST['submit'])){
+    if(empty($_POST['name'])){
+        $error['name']= "name is required";
+    }
+    else{
+        $name = htmlspecialchars($_POST['name']);
+    }
+    
+    if(empty($_POST['book'])){
+        $error['book']= "Book Name is required";
+    }
+    else{
+        $book = htmlspecialchars($_POST['book']);
+    }
+    if(empty($_POST['start_date'])){
+      $error['start_date']= "start date is required";
+    }
+    else{
+        $start_date = htmlspecialchars($_POST['start_date']);        
+    }
+    if(empty($_POST['end_date'])){
+        $error['end_date']= "end date is required";
+    }
+    else{
+        $end_date = htmlspecialchars($_POST['end_date']);        
+    }
+    
+    if(array_filter($error)){
+    }
+    else{
+
+        $name = mysqli_real_escape_string($conn,$_POST['name']);
+        $book = mysqli_real_escape_string($conn,$_POST['book']);
+        $start_date = date(mysqli_real_escape_string($conn,$_POST['start_date']));
+        $end_date = date(mysqli_real_escape_string($conn,$_POST['end_date']));
+        echo $name;
+        $sql = "INSERT INTO `rent data`(`name`,`book`,`start_date`,`end_date`) VALUES ('$name','$book','$start_date','$end_date');";
+        if(mysqli_query($conn,$sql)){
+            header('Location:rent.php');
+            mysqli_close($conn);
+        }
+        else{
+          $end_date['end_date']='Error! Please try again later';
+        }
+    }
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Gisfy</title>
     <link rel="stylesheet" href="style.css" />
     <link
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
@@ -33,10 +102,10 @@
             <header class="header">
               <h1 id="title" class="center-text">Registration Form</h1>
             </header>
-            <form id="survey-form">
+            <form id="survey-form" method="POST">
               <div class="form-index">
-                <label id="student-label" for="studnet">Student Name</label>
-                <select name="student" class="form-control form-location">
+                <label id="name-label" for="name">Student Name</label>
+                <select name="name" class="form-control form-location">
                   <option disabled selected > Select Student Name</option>
                   <option value="abc">abc</option>
                 </select>
@@ -53,8 +122,8 @@
                 <label id="start-label" for="date">Start Date</label>
                 <input
                   type="date"
-                  name="startdate"
-                  id="startdate"
+                  name="start_date"
+                  id="start_date"
                   class="form-control form-location"
                   placeholder="Start Date"
                 />
@@ -63,14 +132,14 @@
                 <label id="end-label" for="date">End Date</label>
                 <input
                   type="date"
-                  name="enddate"
-                  id="enddate"
+                  name="end_date"
+                  id="end_date"
                   class="form-control form-location"
                   placeholder="End Date"
                 />
               </div>
                 <div class="form-index">
-                  <button type="submit" id="submit" class="submit-button">
+                  <button type="submit" name="submit" id="submit" class="submit-button">
                     Submit
                   </button>
                 </div>
@@ -96,15 +165,20 @@
           </div>
           <div class="tbl-content">
             <table>
+            <?php if (count($record)==0){ ?>
+                        <p class="text-center"><?php echo"no data found"; ?></p>
+                    <?php }else{?>
+                <?php foreach($record as $data){ ?>
               <tbody>
                 <tr>
-                  <td>1</td>
-                  <td>Rupal S</td>
-                  <td>CHETAN BHAGAT</td>
-                  <td><a href="" class="edit"><i class="material-icons app-icon">build</i></a></td>
+                  <td><?php echo $count?></td>
+                  <td><?php echo htmlspecialchars($data['name']); ?></td>
+                  <td><?php echo htmlspecialchars($data['book']); ?></td>
+                  <td><a href="book_edit.php?id=<?php echo $data['id']; ?>" class="edit"><i class="material-icons app-icon">build</i></a></td>
                   <td><a href="" class="delete"><i class="material-icons app-icon">highlight_off</i></a></td>
                 </tr>
               </tbody>
+              <?php $count++; }}?>
             </table>
           </div>
         </section>
