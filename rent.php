@@ -15,6 +15,21 @@ $record = mysqli_fetch_all($result,MYSQLI_ASSOC);
 
 mysqli_free_result($result);
 
+$sql="SELECT `name` FROM `book data` ORDER BY `id`;";
+
+$result = mysqli_query($conn,$sql);
+
+$book_record = mysqli_fetch_all($result,MYSQLI_ASSOC);
+
+mysqli_free_result($result);
+
+$sql="SELECT `name` FROM `student data` ORDER BY `id`;";
+
+$result = mysqli_query($conn,$sql);
+
+$student_record = mysqli_fetch_all($result,MYSQLI_ASSOC);
+
+mysqli_free_result($result);
 
 $error = array('book'=>'','name'=>'','start_date'=>'','end_date'=>'');
 
@@ -48,12 +63,11 @@ if(isset($_POST['submit'])){
     if(array_filter($error)){
     }
     else{
-
         $name = mysqli_real_escape_string($conn,$_POST['name']);
         $book = mysqli_real_escape_string($conn,$_POST['book']);
         $start_date = date(mysqli_real_escape_string($conn,$_POST['start_date']));
         $end_date = date(mysqli_real_escape_string($conn,$_POST['end_date']));
-        echo $name;
+        // echo $name;
         $sql = "INSERT INTO `rent data`(`name`,`book`,`start_date`,`end_date`) VALUES ('$name','$book','$start_date','$end_date');";
         if(mysqli_query($conn,$sql)){
             header('Location:rent.php');
@@ -100,14 +114,16 @@ if(isset($_POST['submit'])){
         <div class="section">
           <div class="container">
             <header class="header">
-              <h1 id="title" class="center-text">Registration Form</h1>
+              <h1 id="title" class="center-text">Rent Form</h1>
             </header>
             <form id="survey-form" method="POST">
               <div class="form-index">
                 <label id="name-label" for="name">Student Name</label>
                 <select name="name" class="form-control form-location">
                   <option disabled selected > Select Student Name</option>
-                  <option value="abc">abc</option>
+                  <?php foreach($student_record as $data){ ?>
+                  <option value="<?php echo $data['name']; ?>"><?php echo $data['name']; ?></option>
+                  <?php }?>
                 </select>
               </div>
               
@@ -115,7 +131,9 @@ if(isset($_POST['submit'])){
                 <label id="book-label" for="book">Book Name</label>
                 <select name="book" class="form-control form-location">
                   <option disabled selected > Select Book Name</option>
-                  <option value="abc">abc</option>
+                  <?php foreach($book_record as $data){ ?>
+                  <option value="<?php echo $data['name']; ?>"><?php echo $data['name']; ?></option>
+                  <?php }?>                
                 </select>
               </div>
               <div class="form-index">
@@ -155,8 +173,8 @@ if(isset($_POST['submit'])){
               <thead>
                 <tr>
                   <th>SR NO.</th>
-                  <th>NAME</th>
-                  <th>AUTHOR</th>
+                  <th>STUDENT NAME</th>
+                  <th>BOOK NAME</th>
                   <th>EDIT</th>
                   <th>DELETE</th>
                 </tr>
@@ -174,7 +192,7 @@ if(isset($_POST['submit'])){
                   <td><?php echo $count?></td>
                   <td><?php echo htmlspecialchars($data['name']); ?></td>
                   <td><?php echo htmlspecialchars($data['book']); ?></td>
-                  <td><a href="book_edit.php?id=<?php echo $data['id']; ?>" class="edit"><i class="material-icons app-icon">build</i></a></td>
+                  <td><a href="rent_edit.php?id=<?php echo $data['id']; ?>" class="edit"><i class="material-icons app-icon">build</i></a></td>
                   <td><a href="" class="delete"><i class="material-icons app-icon">highlight_off</i></a></td>
                 </tr>
               </tbody>
@@ -188,25 +206,25 @@ if(isset($_POST['submit'])){
       <div class="app-sidebar">
         <ul class="app-sidebar-menu">
           <li class="active">
-            <a href="index.html">
+            <a href="index.php">
               <i class="material-icons menu-icon">assignment_turned_in</i>
               <span>Student</span>
             </a>
           </li>
           <li>
-            <a href="#payment">
+            <a href="book.php">
               <i class="material-icons menu-icon">payment</i>
               <span>Book</span>
             </a>
           </li>
           <li>
-            <a href="#customers">
+            <a href="rent.php">
               <i class="material-icons menu-icon">error_outline</i>
               <span>Rent</span>
             </a>
           </li>
           <li>
-            <a href="#serverlogs">
+            <a href="logout.php">
               <i class="material-icons menu-icon">supervised_user_circle</i>
               <span>Logout</span>
             </a>

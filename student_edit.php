@@ -153,25 +153,25 @@ if(isset($_POST['submit'])){
       <div class="app-sidebar">
         <ul class="app-sidebar-menu">
           <li class="active">
-            <a href="index.html">
+            <a href="index.php">
               <i class="material-icons menu-icon">assignment_turned_in</i>
               <span>Student</span>
             </a>
           </li>
           <li>
-            <a href="#payment">
+            <a href="book.php">
               <i class="material-icons menu-icon">payment</i>
               <span>Book</span>
             </a>
           </li>
           <li>
-            <a href="#customers">
+            <a href="rent.php">
               <i class="material-icons menu-icon">error_outline</i>
               <span>Rent</span>
             </a>
           </li>
           <li>
-            <a href="#serverlogs">
+            <a href="logout.php">
               <i class="material-icons menu-icon">supervised_user_circle</i>
               <span>Logout</span>
             </a>
