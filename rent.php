@@ -193,7 +193,7 @@ if(isset($_POST['submit'])){
                   <td><?php echo htmlspecialchars($data['name']); ?></td>
                   <td><?php echo htmlspecialchars($data['book']); ?></td>
                   <td><a href="rent_edit.php?id=<?php echo $data['id']; ?>" class="edit"><i class="material-icons app-icon">build</i></a></td>
-                  <td><a href="" class="delete"><i class="material-icons app-icon">highlight_off</i></a></td>
+                  <td><a href="delete_rent.php?id=<?php echo $data['id']; ?>" class="delete"><i class="material-icons app-icon">highlight_off</i></a></td>
                 </tr>
               </tbody>
               <?php $count++; }}?>

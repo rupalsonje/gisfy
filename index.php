@@ -221,9 +221,9 @@ else{
                 <tr>
                   <td><?php echo $count?></td>
                   <td><?php echo htmlspecialchars($data['name']); ?></td>
-                  <td><?php echo htmlspecialchars($data['author']); ?></td>
-                  <td><a href="" class="edit"><i class="material-icons app-icon">build</i></a></td>
-                  <td><a href="" class="delete"><i class="material-icons app-icon">highlight_off</i></a></td>
+                  <td><?php echo htmlspecialchars($data['class']); ?></td>
+                  <td><a href="student_edit.php?id=<?php echo $data['id']; ?>" class="edit"><i class="material-icons app-icon">build</i></a></td>
+                  <td><a href="delete_student.php?id=<?php echo $data['id']; ?>" class="delete"><i class="material-icons app-icon">highlight_off</i></a></td>
                 </tr>
               </tbody>
               <?php $count++; }}?>

@@ -32,7 +32,7 @@
                 $data=mysqli_fetch_assoc($result);
                 $_SESSION['username']=$data['username'];
                 $_SESSION['success'] = "You are now logged in";
-                header('location: index.html');
+                header('location: index.php');
                 mysqli_free_result($result);
                 mysqli_close($conn);
             }
