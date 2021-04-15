@@ -17,7 +17,7 @@ if(isset($_GET['id'])){
     mysqli_free_result($result);
 }
 
-$error = array('class'=>'','name'=>'');
+$error = array('class'=>'','name'=>'','image'=>'','video'=>'');
 
 if(isset($_POST['submit'])){
     if(empty($_POST['name'])){
@@ -31,39 +31,48 @@ if(isset($_POST['submit'])){
         $error['class']= "class is required";
     }
     else{
-        $author = htmlspecialchars($_POST['author']);
+        $class = htmlspecialchars($_POST['class']);
     }
-    if(empty($_POST['image'])){
-        $error['image']= "image is required";
-    }
-    else{
-        $image = htmlspecialchars($_POST['image']);        
-    }
-    if(empty($_POST['video'])){
-        $error['video']= "video is required";
-    }
-    else{
-        $video = htmlspecialchars($_POST['video']);        
-    }
-    
     if(array_filter($error)){
     }
     else{
         $name = mysqli_real_escape_string($conn,$_POST['name']);
         $class = mysqli_real_escape_string($conn,$_POST['class']);        
-        $image = mysqli_real_escape_string($conn,$_POST['image']);
-        $video = mysqli_real_escape_string($conn,$_POST['video']);
 
-        $sql = "UPDATE `student data` SET `name`='".$name."',`class`='".$class."',`image`='".$image."',`video`='".$video."' WHERE id='".$id."'";
-            
-        if(mysqli_query($conn,$sql)){
-            header('Location:index.php');
-            mysqli_close($conn);
+        // $sql = "UPDATE `student data` SET `name`='".$name."',`class`='".$class."',`image`='".$image."',`video`='".$video."' WHERE id='".$id."'";
+        $filename = $_FILES["image"]["name"];
+        $tempname = $_FILES["image"]["tmp_name"];    
+        $folder = "uploads/".$filename;
+    
+        $target_file = "uploads/" . basename($_FILES["video"]["name"]);
+        $uploadOk = 1;
+        $imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
+      //   if($imageFileType != "wmv" && $imageFileType != "mp4" && $imageFileType != "avi" && $imageFileType != "MP4") {
+      //     echo "Sorry, only wmv, mp4 & avi files are allowed.";
+      //     $uploadOk = 0;
+      // }
+        if ($_FILES["video"]["size"] > 500000000) {
+          $error['video'] = "Sorry, your file is too large.";
+          $uploadOk = 0;
         }
-        else{
-            $error['video']="Error! Unable to get data";
-            // echo print_r($error);
-        }
+        if ($uploadOk == 0) {
+          $error['video'] = "Sorry, your file was not uploaded.";
+        } 
+        else {
+          // $sql = "INSERT INTO `student data`(`name`,`class`,`image`,`video`) VALUES ('$name','$class','$filename','$target_file');";
+          $sql = "UPDATE `student data` SET `name`='".$name."',`class`='".$class."',`image`='".$filename."',`video`='".$target_file."' WHERE id='".$id."'";
+          if(mysqli_query($conn,$sql)){
+            if (move_uploaded_file($_FILES["video"]["tmp_name"], $target_file)) {
+              if (move_uploaded_file($tempname, $folder))  {
+                header('Location:index.php');
+                mysqli_close($conn);
+              }
+            }    
+          } 
+          else {
+            $error['video'] = "Sorry, your file was not uploaded.";
+          }
+        }    
     }
 }
 
@@ -104,7 +113,7 @@ if(isset($_POST['submit'])){
             <header class="header">
               <h1 id="title" class="center-text">Registration Form</h1>
             </header>
-            <form id="survey-form" method="POST">
+            <form id="survey-form" method="POST" enctype="multipart/form-data">
               <div class="form-index">
                 <label id="name-label" for="name">Name</label>
                 <input
@@ -131,12 +140,12 @@ if(isset($_POST['submit'])){
               </div>
               <div class="form-index">
                 <label id="image-label" for="image">Image</label>
-                <input type="file" id="image" name="image" accept="image/*" class="form-control form-location" >
+                <input type="file" id="image" name="image" class="form-control form-location" >
                 <small><?php echo $error['image']; ?></small>
               </div>
               <div class="form-index">
                 <label id="video-label" for="video">Video</label>
-                <input type="file" id="video" name="video" accept="video/mp4,video/x-m4v,video/*" class="form-control form-location" >
+                <input type="file" id="video" name="video" class="form-control form-location" >
                 <small><?php echo $error['video']; ?></small>
               </div>
                 <div class="form-index">

@@ -32,15 +32,15 @@ else{
     $class= htmlspecialchars($_POST['class']);
 }
 
-if(empty($_POST['image'])){
-    $error['image']= "image is required";
-}
+// if(empty($_POST['image'])){
+//     $error['image']= "image is required";
+// }
 // else{
 //     $image = htmlspecialchars($_POST['image']);        
 // }
-if(empty($_POST['video'])){
-    $error['video']= "video is required";
-}
+// if(empty($_POST['video'])){
+//     $error['video']= "video is required";
+// }
 // else{
 //     $video = htmlspecialchars($_POST['video']);        
 // }
@@ -50,67 +50,37 @@ else{
  
     $name = mysqli_real_escape_string($conn,$_POST['name']);
     $class = mysqli_real_escape_string($conn,$_POST['class']);
+    $filename = $_FILES["image"]["name"];
+    $tempname = $_FILES["image"]["tmp_name"];    
+    $folder = "uploads/".$filename;
 
-    $target_dir = "uploads/";
-    $target_file = $target_dir . basename($_FILES["image"]["name"]);
+    $target_file = "uploads/" . basename($_FILES["video"]["name"]);
     $uploadOk = 1;
     $imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
-  
-    if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
-        echo "The file ". basename( $_FILES["image"]["name"]). " has been uploaded.";
-    } else {
-        echo "Sorry, there was an error uploading your file.";
+  //   if($imageFileType != "wmv" && $imageFileType != "mp4" && $imageFileType != "avi" && $imageFileType != "MP4") {
+  //     echo "Sorry, only wmv, mp4 & avi files are allowed.";
+  //     $uploadOk = 0;
+  // }
+    if ($_FILES["video"]["size"] > 500000000) {
+      $error['video'] = "Sorry, your file is too large.";
+      $uploadOk = 0;
     }
-  
-    $image=basename( $_FILES["image"]["name"],".jpg"); // used to store the filename in a variable
-  
-    //storind the data in your database
-    // $query= "INSERT INTO items VALUES ('$id','$title','$description','$price','$value','$contact','$image')";
-    // mysql_query($query);
-  
-    // require('heading.php');
-    // echo "Your add has been submited, you will be redirected to your account page in 3 seconds....";
-    $target_video = $target_dir . basename($_FILES["video"]["name"]);
-    $ok=1;
-    //This is our size condition 
-    if ($uploaded_size > 350000) 
-    { 
-    echo "Your file is too large.<br>"; 
-    $ok=0; 
+    if ($uploadOk == 0) {
+      $error['video'] = "Sorry, your file was not uploaded.";
     } 
-
-    //This is our limit file type condition 
-    // if ($uploaded_type =="text/php") 
-    // { 
-    //   $error['video']= "No PHP files"; 
-    // $ok=0; 
-    // } 
-
-    //Here we check that $ok was not set to 0 by an error 
-    if ($ok==0) 
-    { 
-      $error['video']="Sorry your file was not uploaded"; 
-    } 
-
-    //If everything is ok we try to upload it 
-    else 
-    { 
-    if(move_uploaded_file($_FILES['uploaded']['tmp_name'], $target)) 
-    { 
-    $video = basename( $_FILES['uploadedfile']['name']); 
-    } 
-    else 
-    { 
-    $error['video']="Sorry, there was a problem uploading your file."; 
-    } 
-    }
-    $sql = "INSERT INTO `students data`(`name`,`class`,`image`,`video`) VALUES ('$name','$class','$image','$video');";
-    if(mysqli_query($conn,$sql)){
-        header('Location:index.php');
-        mysqli_close($conn);
-    }
-    else{
-      $error['video']= 'Error! Please Try Again Later';
+    else {
+      $sql = "INSERT INTO `student data`(`name`,`class`,`image`,`video`) VALUES ('$name','$class','$filename','$target_file');";
+      if(mysqli_query($conn,$sql)){
+        if (move_uploaded_file($_FILES["video"]["tmp_name"], $target_file)) {
+          if (move_uploaded_file($tempname, $folder))  {
+            header('Location:index.php');
+            mysqli_close($conn);
+          }
+        }    
+      } 
+      else {
+        $error['video'] = "Sorry, your file was not uploaded.";
+      }
     }
 }
 }
@@ -176,14 +146,16 @@ else{
                 />
                 <small><?php echo $error['class']; ?></small>
               </div>
+              <!-- accept="image/*" -->
               <div class="form-index">
                 <label id="image-label" for="image">Image</label>
-                <input type="file" id="image" name="image" accept="image/*" class="form-control form-location">
+                <input type="file" id="image" name="image"  class="form-control form-location">
                 <small><?php echo $error['image']; ?></small>
               </div>
+              <!-- accept="video/mp4,video/x-m4v,video/*" -->
               <div class="form-index">
                 <label id="video-label" for="video">Video</label>
-                <input type="file" id="video" name="video" accept="video/mp4,video/x-m4v,video/*" class="form-control form-location">
+                <input type="file" id="video" name="video" class="form-control form-location">
                 <small><?php echo $error['video']; ?></small>
               </div>
                 <div class="form-index">
